@@ -42,13 +42,15 @@ namespace SunburstDrillDown {
         #region Process DrillDown
         void sunburstControl1_MouseUp(object sender, MouseEventArgs e) {
             SunburstHitInfo shi = sunburstControl1.CalcHitInfo(e.Location);
-            if (shi.InSunburstItem) {
-                dataStack.Push(new DataSourceInfo(DataAdapter.DataSource, sunburstControl1.CenterLabel.TextPattern));
-                TypeInfo data = (TypeInfo)shi.SunburstItem.Tag;
-                DataAdapter.DataSource = data;
-                sunburstControl1.CenterLabel.TextPattern += "." + data.NamespaceString;
+            if(shi.InSunburstItem) {
+                TypeInfo drillDownDataSource = (TypeInfo)shi.SunburstItem.Tag;
+                if(DataAdapter.DataSource != drillDownDataSource) {
+                    dataStack.Push(new DataSourceInfo(DataAdapter.DataSource, sunburstControl1.CenterLabel.TextPattern));
+                    DataAdapter.DataSource = drillDownDataSource;
+                    sunburstControl1.CenterLabel.TextPattern += "." + drillDownDataSource.NamespaceString;
+                }
             }
-            else if (shi.InCenterLabel && dataStack.Count > 0) {
+            else if(shi.InCenterLabel && dataStack.Count > 0) {
                 DataSourceInfo sourceInfo = dataStack.Pop();
                 DataAdapter.DataSource = sourceInfo.Source;
                 sunburstControl1.CenterLabel.TextPattern = sourceInfo.Label;
@@ -84,5 +86,3 @@ namespace SunburstDrillDown {
         }
     }
 }
-
-
