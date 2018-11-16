@@ -53,10 +53,12 @@ Namespace SunburstDrillDown
         Private Sub sunburstControl1_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles sunburstControl1.MouseUp
             Dim shi As SunburstHitInfo = sunburstControl1.CalcHitInfo(e.Location)
             If shi.InSunburstItem Then
-                dataStack.Push(New DataSourceInfo(DataAdapter.DataSource, sunburstControl1.CenterLabel.TextPattern))
-                Dim data As TypeInfo = CType(shi.SunburstItem.Tag, TypeInfo)
-                DataAdapter.DataSource = data
-                sunburstControl1.CenterLabel.TextPattern &= "." & data.NamespaceString
+                Dim drillDownDataSource As TypeInfo = CType(shi.SunburstItem.Tag, TypeInfo)
+                If DataAdapter.DataSource IsNot drillDownDataSource Then
+                    dataStack.Push(New DataSourceInfo(DataAdapter.DataSource, sunburstControl1.CenterLabel.TextPattern))
+                    DataAdapter.DataSource = drillDownDataSource
+                    sunburstControl1.CenterLabel.TextPattern &= "." & drillDownDataSource.NamespaceString
+                End If
             ElseIf shi.InCenterLabel AndAlso dataStack.Count > 0 Then
                 Dim sourceInfo As DataSourceInfo = dataStack.Pop()
                 DataAdapter.DataSource = sourceInfo.Source
@@ -99,5 +101,3 @@ Namespace SunburstDrillDown
         End Function
     End Class
 End Namespace
-
-
